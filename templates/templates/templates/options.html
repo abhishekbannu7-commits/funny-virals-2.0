@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{width:1080px;height:1350px;background:#000;font-family:Arial,sans-serif;color:#fff;}
+.slide{width:100%;height:100%;padding:70px;display:flex;flex-direction:column;}
+.logo img{height:80px;display:block;margin:auto;}
+.title{text-align:center;font-size:58px;font-weight:900;margin:40px 0;color:#ff2d7a;}
+.option{
+background:#1a1a1a;
+border:2px solid #ff2d7a;
+border-radius:25px;
+padding:30px;
+margin:15px 0;
+font-size:42px;
+font-weight:bold;
+text-align:center;
+}
+.footer{margin-top:auto;text-align:center;border-top:2px solid rgba(255,45,122,.25);padding-top:25px;}
+.cta{font-size:42px;color:#ff2d7a;font-weight:bold;}
+.handle{font-size:24px;color:#888;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="slide">
+<div class="logo"><img src="{{logo}}"></div>
+<div class="title">{{title}}</div>
+
+<div class="option">{{option1}}</div>
+<div class="option">{{option2}}</div>
+<div class="option">{{option3}}</div>
+<div class="option">{{option4}}</div>
+
+<div class="footer">
+<div class="cta">{{cta}}</div>
+<div class="handle">{{instagram}}</div>
+</div>
+
+</div>
+</body>
+</html>
