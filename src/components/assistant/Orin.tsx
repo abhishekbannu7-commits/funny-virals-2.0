@@ -21,7 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { detectDevice, handoffHref, type DeviceKind } from "@/lib/assistant/device";
 import { cardFromPlan, makeLinkCode, normalizeCode, parseWireJob, planToWire, type Card, type WireJob } from "@/lib/assistant/jobs";
-import { applyLocal, ding, reminderLine, senseDevice, speakFree } from "@/lib/assistant/local";
+import { applyLocal, ding, primeVoice, reminderLine, senseDevice, speakFree } from "@/lib/assistant/local";
 import { offlineMiss } from "@/lib/assistant/engines";
 import { CAPABILITIES, loadCloudOptIn, saveCloudOptIn } from "@/lib/assistant/policy";
 import { emptyVault, loadVault, saveVault, type Reminder, type Vault } from "@/lib/assistant/vault";
@@ -538,6 +538,7 @@ export function Orin() {
   }
 
   function toggleListen() {
+    primeVoice();
     if (listening) {
       stopWanted.current = true;
       keepRef.current = false;
@@ -548,6 +549,20 @@ export function Orin() {
     }
     stopWanted.current = false;
     startRec();
+  }
+
+  function hearOrin() {
+    if (!window.speechSynthesis) {
+      setError("This browser has no voice. Try Chrome or Safari on the phone.");
+      return;
+    }
+    setError(null);
+    primeVoice();
+    if (quietRef.current) {
+      void run("you can talk");
+      return;
+    }
+    speakFree("I'm here. Ask for a task, a timer, or a reel.", false);
   }
 
   function toggleKeep() {
@@ -696,16 +711,20 @@ export function Orin() {
           {listening ? <Square className="size-6" /> : <Mic className="size-6" />}
           <span className="sr-only">{listening ? "Stop listening" : "Listen"}</span>
         </button>
-        <p className="text-sm text-muted">{listening ? "Listening" : busy ?? "Tap the circle, or type below."}</p>
-        <Button onClick={toggleKeep} aria-pressed={keep}>
-          {keep ? "Stop staying on" : "Stay listening"}
-        </Button>
+        <p className="text-sm text-muted">{listening ? "Listening" : busy ?? "Tap the circle, or type below. Orin speaks the reply."}</p>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Button onClick={hearOrin}>{vault.quiet ? "Turn voice on" : "Hear Orin"}</Button>
+          <Button onClick={toggleKeep} aria-pressed={keep}>
+            {keep ? "Stop staying on" : "Stay listening"}
+          </Button>
+        </div>
       </div>
 
       <form
         className="flex flex-col gap-3"
         onSubmit={(event) => {
           event.preventDefault();
+          primeVoice();
           void run(command);
         }}
       >

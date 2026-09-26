@@ -661,18 +661,61 @@ export async function senseDevice(text: string): Promise<AidePlan | null> {
   return null;
 }
 
+let voicePrimed = false;
+
+export function primeVoice() {
+  if (typeof window === "undefined" || !window.speechSynthesis) return;
+  const synth = window.speechSynthesis;
+  synth.resume();
+  if (voicePrimed) return;
+  voicePrimed = true;
+  const unlock = new SpeechSynthesisUtterance(" ");
+  unlock.volume = 0;
+  synth.speak(unlock);
+}
+
+function pickVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  const english = voices.filter((item) => /^en([-_]|$)/i.test(item.lang));
+  const ranked = [/samantha/i, /google uk english female/i, /google us english/i, /aria/i, /jenny/i];
+  for (const pattern of ranked) {
+    const match = english.find((item) => pattern.test(item.name));
+    if (match) return match;
+  }
+  return english.find((item) => !/compact|espeak/i.test(item.name)) ?? english[0];
+}
+
 export function speakFree(text: string, quiet: boolean) {
   if (quiet || typeof window === "undefined" || !window.speechSynthesis) return;
-  const utter = new SpeechSynthesisUtterance(text.slice(0, 220));
-  utter.lang = "en-US";
-  utter.rate = 1;
-  const voices = window.speechSynthesis.getVoices();
-  const voice =
-    voices.find((item) => /^en/i.test(item.lang) && /female|samantha|google uk/i.test(item.name)) ??
-    voices.find((item) => /^en/i.test(item.lang));
-  if (voice) utter.voice = voice;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utter);
+  const line = text.replace(/\s+/g, " ").trim().slice(0, 280);
+  if (!line) return;
+  const synth = window.speechSynthesis;
+  let started = false;
+  const start = () => {
+    if (started) return;
+    started = true;
+    const utter = new SpeechSynthesisUtterance(line);
+    const voice = pickVoice();
+    utter.lang = voice?.lang || "en-US";
+    utter.rate = 0.96;
+    if (voice) utter.voice = voice;
+    synth.cancel();
+    window.setTimeout(() => {
+      synth.resume();
+      synth.speak(utter);
+    }, 40);
+  };
+  if (synth.getVoices().length > 0) {
+    start();
+    return;
+  }
+  const onVoices = () => {
+    synth.removeEventListener("voiceschanged", onVoices);
+    start();
+  };
+  synth.addEventListener("voiceschanged", onVoices);
+  synth.getVoices();
+  window.setTimeout(onVoices, 400);
 }
 
 export function reminderLine(text: string) {
