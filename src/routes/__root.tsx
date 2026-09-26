@@ -3,7 +3,7 @@ import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "Orin";
+const APP_NAME = "Zoro";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -14,7 +14,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "Orin is an on-device aide. Tasks, notes, and a film plan stay in this browser. Cloud video stays off unless you confirm it. You confirm every call, message, and post.",
+          "Zoro is an on-device aide. Tasks, notes, and a film plan stay in this browser. Cloud video stays off unless you confirm it. You confirm every call, message, and post.",
       },
       { name: "theme-color", content: "#0c0c0b" },
     ],

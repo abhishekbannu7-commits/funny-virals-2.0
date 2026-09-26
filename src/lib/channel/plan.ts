@@ -207,7 +207,7 @@ function episodeCount(text: string) {
 }
 
 function topicOf(text: string) {
-  let t = tidy(text).replace(/^(?:orin[, ]+)?/i, "");
+  let t = tidy(text).replace(/^(?:(?:zoro|orin)[, ]+)?/i, "");
   t = t.replace(/\b(?:create|make|plan|build|start|launch|a|an|the|faceless|channel|for|about|youtube|instagram|facebook|episode|episodes|first|and|prepare|it|publish)\b/gi, " ");
   t = t.replace(/[^a-z0-9\s-]/gi, " ");
   t = tidy(t);

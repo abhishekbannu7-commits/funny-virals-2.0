@@ -396,10 +396,10 @@ export const askAide = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }): Promise<{ ok: true; plan: AidePlan } | Err> => {
-    const history = (data.history ?? []).map((turn) => `${turn.who === "you" ? "User" : "Orin"}: ${turn.text}`).join("\n");
+    const history = (data.history ?? []).map((turn) => `${turn.who === "you" ? "User" : "Zoro"}: ${turn.text}`).join("\n");
     const user = history ? `Recent turns:\n${history}\n\nNow: ${data.command}` : data.command;
     const result = await chatJson(
-      `You are Orin, a calm personal aide on the user's own phone, tablet, or a screen linked to them. Return JSON only.
+      `You are Zoro, a calm personal aide on the user's own phone, tablet, or a screen linked to them. Return JSON only.
 You do not place calls, send messages, or open apps yourself. You prepare one action the user will confirm with a tap.
 Fields:
 - say: one short sentence, under 160 characters, spoken aloud. Say what you prepared, never that it is already sent or dialed.

@@ -473,7 +473,7 @@ export function Studio() {
         <div className="min-w-0">
           <p className="text-xs font-medium tracking-widest text-muted uppercase">Optional studio</p>
           <h1 className="font-display text-2xl leading-tight font-medium">Funny Virals</h1>
-          <p className="text-sm text-muted">Not part of Orin. Cloud steps are labeled and idle until you tap.</p>
+          <p className="text-sm text-muted">Not part of Zoro. Cloud steps are labeled and idle until you tap.</p>
         </div>
         <div className="flex gap-2">
           <Button onClick={loadSample}>Sample</Button>

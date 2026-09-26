@@ -11,7 +11,7 @@ export const CAPABILITIES: Capability[] = [
   { name: "Spoken reply", net: "Offline", detail: "This device's own voice. No speech API." },
   { name: "Calls and texts", net: "On device", detail: "Opens the dialer or Messages. You tap." },
   { name: "Apps and maps", net: "On device", detail: "A link you confirm. No maps API." },
-  { name: "Phone link", net: "Local link", detail: "Two open Orin screens. Not a locked phone." },
+  { name: "Phone link", net: "Local link", detail: "Two open Zoro screens. Not a locked phone." },
   { name: "Open-ended writing", net: "Optional cloud", detail: "Off by default. Or hand the words to ChatGPT." },
   { name: "Creative studio", net: "Offline", detail: "Plans, edits, and plays the film on this device." },
   { name: "Faceless channels", net: "Offline", detail: "Series, scripts, and metadata stay here. Publish is a handoff." },

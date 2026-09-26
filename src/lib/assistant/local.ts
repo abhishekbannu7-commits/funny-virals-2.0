@@ -452,7 +452,7 @@ export function applyLocal(text: string, vault: Vault, now = new Date()): LocalH
     const at = clockAt(remindAt[1], now);
     if (!at) return { plan: answer("Say a time like 7:30 pm."), vault, notify: false };
     return {
-      plan: answer(`Set for ${formatWhen(at, now)}. It rings while Orin is open.`),
+      plan: answer(`Set for ${formatWhen(at, now)}. It rings while Zoro is open.`),
       vault: pushReminder(vault, remindAt[2].trim(), at),
       notify: true,
     };

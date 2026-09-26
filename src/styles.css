@@ -67,7 +67,7 @@
   animation: kenburns 10s linear forwards;
 }
 
-.orin-orb {
+.zoro-orb {
   width: 7.5rem;
   height: 7.5rem;
   border-radius: 999px;
@@ -76,16 +76,16 @@
   transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1), border-color 250ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.orin-orb[data-linked="true"] {
+.zoro-orb[data-linked="true"] {
   border-color: var(--color-accent);
 }
 
-.orin-orb[data-live="true"] {
+.zoro-orb[data-live="true"] {
   border-color: var(--color-accent);
-  animation: orin-pulse 1.6s ease-in-out infinite;
+  animation: zoro-pulse 1.6s ease-in-out infinite;
 }
 
-@keyframes orin-pulse {
+@keyframes zoro-pulse {
   50% {
     transform: scale(1.04);
   }
@@ -105,7 +105,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .kenburns,
-  .orin-orb[data-live="true"] {
+  .zoro-orb[data-live="true"] {
     animation: none;
   }
 }

@@ -103,7 +103,7 @@ function paintScene(ctx: CanvasRenderingContext2D, project: CreativeProject, sce
     ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = "#d5e4ee";
     ctx.font = `600 ${wide ? 28 : 32}px Outfit, sans-serif`;
-    ctx.fillText("Orin", 36, height * 0.38);
+    ctx.fillText("Zoro", 36, height * 0.38);
     ctx.fillStyle = "#f3f1ea";
     ctx.font = `600 ${wide ? 42 : 52}px Fraunces, Georgia, serif`;
     wrap(ctx, project.cta, width - 72).forEach((line, i) => ctx.fillText(line, 36, height * 0.38 + 64 + i * 58));

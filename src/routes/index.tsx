@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Orin } from "@/components/assistant/Orin";
+import { Zoro } from "@/components/assistant/Zoro";
 
 export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
-  return <Orin />;
+  return <Zoro />;
 }

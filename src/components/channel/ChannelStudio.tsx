@@ -160,7 +160,7 @@ export function ChannelStudio({ brief, onBack }: { brief: string; onBack: () => 
           </div>
         </section>
       ) : (
-        <p className="text-sm text-muted">No series yet. Plan one, or ask Orin to create a faceless channel.</p>
+        <p className="text-sm text-muted">No series yet. Plan one, or ask Zoro to create a faceless channel.</p>
       )}
 
       {queue.length ? (

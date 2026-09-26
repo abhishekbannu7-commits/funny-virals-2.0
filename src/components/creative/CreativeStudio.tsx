@@ -37,7 +37,7 @@ function loadInitial(brief: string) {
 }
 
 function slug(title: string) {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "orin";
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "zoro";
 }
 
 export function CreativeStudio({
@@ -249,7 +249,7 @@ export function CreativeStudio({
       <header className="flex flex-col gap-3 border-b border-line px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="min-w-0">
           <p className="text-xs font-medium tracking-widest text-muted uppercase">Creative studio</p>
-          <h1 className="font-display text-2xl leading-tight font-medium">Orin</h1>
+          <h1 className="font-display text-2xl leading-tight font-medium">Zoro</h1>
           <p className="text-sm text-muted">Plans, pictures, music, and the cut stay here. Cloud is a second tap, and it is not connected.</p>
         </div>
         <div className="flex flex-wrap gap-2">

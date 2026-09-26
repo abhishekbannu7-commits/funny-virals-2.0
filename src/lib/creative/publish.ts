@@ -18,7 +18,7 @@ export function publishTargets(platforms: Platform[]): PublishTarget[] {
         label: "YouTube",
         mode: "handoff",
         reason:
-          "YouTube can take an authorized upload. This page has no YouTube sign-in, so the handoff is the official upload page. Orin does not post.",
+          "YouTube can take an authorized upload. This page has no YouTube sign-in, so the handoff is the official upload page. Zoro does not post.",
         href: "https://www.youtube.com/upload",
       };
     }
@@ -27,7 +27,7 @@ export function publishTargets(platforms: Platform[]): PublishTarget[] {
         platform,
         label: "Facebook",
         mode: "handoff",
-        reason: "Facebook posting needs a Page authorization that is not connected. The handoff is the official site. Orin does not post.",
+        reason: "Facebook posting needs a Page authorization that is not connected. The handoff is the official site. Zoro does not post.",
         href: "https://www.facebook.com/",
       };
     }

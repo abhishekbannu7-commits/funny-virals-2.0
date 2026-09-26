@@ -53,7 +53,7 @@ function languageOf(text: string) {
 
 function topicOf(text: string) {
   let t = tidy(text);
-  t = t.replace(/^(?:orin[, ]+)?(?:please )?(?:make|create|produce|build|generate)\s+/i, "");
+  t = t.replace(/^(?:(?:zoro|orin)[, ]+)?(?:please )?(?:make|create|produce|build|generate)\s+/i, "");
   t = t.replace(/^(?:me\s+)?(?:a|an)\s+/i, "");
   t = t.replace(/\b\d+\s*-?\s*(?:second|sec|minute|min)s?\b/gi, " ");
   t = t.replace(/\b(?:cinematic|emotional|realistic|funny|instagram|facebook|youtube|reel|video|film|short|documentary|format|narration|subtitles|subtitle|bgm|music)\b/gi, " ");
@@ -133,7 +133,7 @@ function tagsFor(topic: string, platforms: Platform[]) {
     .split(/[^a-z0-9]+/)
     .filter((word) => word.length > 2)
     .slice(0, 3);
-  const base = ["orin", ...words];
+  const base = ["zoro", ...words];
   if (platforms.includes("instagram")) base.push("reels");
   if (platforms.includes("youtube")) base.push("shorts");
   return [...new Set(base)].slice(0, 6);
