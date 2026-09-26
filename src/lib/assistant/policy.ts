@@ -14,6 +14,7 @@ export const CAPABILITIES: Capability[] = [
   { name: "Phone link", net: "Local link", detail: "Two open Orin screens. Not a locked phone." },
   { name: "Open-ended writing", net: "Optional cloud", detail: "Off by default. Or hand the words to ChatGPT." },
   { name: "Creative studio", net: "Offline", detail: "Plans, edits, and plays the film on this device." },
+  { name: "Faceless channels", net: "Offline", detail: "Series, scripts, and metadata stay here. Publish is a handoff." },
   { name: "Cloud stills and clips", net: "Optional cloud", detail: "Shot desk only. Named, and idle until you tap." },
 ];
 

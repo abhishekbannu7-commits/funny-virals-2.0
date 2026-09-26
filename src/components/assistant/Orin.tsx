@@ -29,6 +29,7 @@ import { useP2PRoom, type PeerInfo } from "@/lib/multiplayer";
 import { askAide, generateStill, type AidePlan } from "@/lib/studio/server";
 import { Studio } from "@/components/studio/Studio";
 import { CreativeStudio } from "@/components/creative/CreativeStudio";
+import { ChannelStudio } from "@/components/channel/ChannelStudio";
 
 type Rec = {
   lang: string;
@@ -197,8 +198,9 @@ export function Orin() {
   const [error, setError] = useState<string | null>(null);
   const [card, setCard] = useState<Card | null>(null);
   const [incoming, setIncoming] = useState<Card | null>(null);
-  const [desk, setDesk] = useState<null | "create" | "shots">(null);
+  const [desk, setDesk] = useState<null | "create" | "shots" | "channels">(null);
   const [brief, setBrief] = useState("");
+  const [channelBrief, setChannelBrief] = useState("");
   const [device, setDevice] = useState<DeviceKind | null>(null);
   const [copied, setCopied] = useState(false);
   const [code, setCode] = useState<string | null>(null);
@@ -384,9 +386,15 @@ export function Orin() {
       setCard({ say: plan.say });
       pushTurn("orin", plan.say);
       speakFree(plan.say, quietRef.current);
+      const prompt = plan.prompt ?? "";
+      if (prompt.startsWith("channel\n")) {
+        setChannelBrief(prompt.slice("channel\n".length));
+        setDesk("channels");
+        return;
+      }
       if (/shot desk/i.test(plan.say)) setDesk("shots");
       else {
-        setBrief(plan.prompt ?? "");
+        setBrief(prompt);
         setDesk("create");
       }
       return;
@@ -633,6 +641,10 @@ export function Orin() {
     setCanInstall(false);
   }
 
+  if (desk === "channels") {
+    return <ChannelStudio brief={channelBrief} onBack={() => setDesk(null)} />;
+  }
+
   if (desk === "shots") {
     return (
       <div>
@@ -679,9 +691,12 @@ export function Orin() {
           <p className="text-xs font-medium tracking-widest text-muted uppercase">Aide</p>
           <h1 className="font-display text-3xl leading-tight font-medium">Orin</h1>
         </div>
-        <Button variant="primary" onClick={() => { setBrief(""); setDesk("create"); }}>
-          Create
-        </Button>
+        <div className="flex shrink-0 gap-2">
+          <Button onClick={() => { setChannelBrief(""); setDesk("channels"); }}>Channels</Button>
+          <Button variant="primary" onClick={() => { setBrief(""); setDesk("create"); }}>
+            Create
+          </Button>
+        </div>
       </header>
 
       {incoming ? (
