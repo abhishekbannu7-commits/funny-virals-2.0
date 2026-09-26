@@ -492,6 +492,107 @@ export function applyLocal(text: string, vault: Vault, now = new Date()): LocalH
     return { plan: answer(`Forgot ${forget[1]}.`), vault: { ...vault, facts, places }, notify: false };
   }
 
+  if (/^(?:help|what can you do|what do you do|capabilities)\??$/i.test(t)) {
+    return {
+      plan: answer(
+        "Offline: tasks, notes, timers, math, memory, and apps you tap.",
+        [
+          "Tasks, notes, reminders, and facts stay in this browser.",
+          "Math, percentages, dates, and unit conversion stay here.",
+          "Call, text, Maps, ChatGPT, Claude, WhatsApp, YouTube, Instagram, and Mail open only after you tap.",
+          "This page cannot change Wi-Fi, Bluetooth, system alarms, or read other apps' notifications.",
+          "Optional cloud is a separate switch. It does nothing until you turn it on and tap again.",
+        ].join("\n"),
+      ),
+      vault,
+      notify: false,
+    };
+  }
+
+  if (/^(?:open )?(?:the )?(?:reel desk|studio)\.?$/i.test(t)) {
+    return {
+      plan: {
+        say: "Reel desk is open. Cloud buttons there are labeled and stay idle until you tap.",
+        action: "studio",
+      },
+      vault,
+      notify: false,
+    };
+  }
+
+  if (
+    /^(?:turn|switch|set|change|enable|disable|toggle)\b.+\b(?:wi-?fi|bluetooth|brightness|volume|airplane|do not disturb|dnd|system alarm)\b/i.test(
+      t,
+    ) ||
+    /^(?:open )?(?:settings|notifications)\.?$/i.test(t)
+  ) {
+    return {
+      plan: answer("This page can't change phone settings or read other apps' notifications. Use the phone's own Settings."),
+      vault,
+      notify: false,
+    };
+  }
+
+  const inDays = t.match(/^(?:what day is it|what(?:'s| is) the date) in (\d{1,4}) days?\??$/i);
+  if (inDays) {
+    const n = Number(inDays[1]);
+    if (n > 3650) return { plan: answer("I only look ahead ten years."), vault, notify: false };
+    const due = new Date(now);
+    due.setDate(due.getDate() + n);
+    const label = due.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+    return { plan: answer(`In ${n} days it is ${label}.`), vault, notify: false };
+  }
+
+  const find = t.match(/^(?:search|find)(?: in)? (?:my )?(notes|tasks|memory|facts)(?: for)?\s+(.{1,80})$/i);
+  if (find) {
+    const kind = find[1].toLowerCase();
+    const needle = find[2].toLowerCase();
+    if (kind === "notes") {
+      const hits = vault.notes.filter((item) => item.text.toLowerCase().includes(needle));
+      if (!hits.length) return { plan: answer("No notes match."), vault, notify: false };
+      return {
+        plan: answer(`${hits.length} notes match.`, hits.slice(-8).map((item) => item.text).join("\n")),
+        vault,
+        notify: false,
+      };
+    }
+    if (kind === "tasks") {
+      const hits = openTasks(vault).filter((item) => item.text.toLowerCase().includes(needle));
+      if (!hits.length) return { plan: answer("No open tasks match."), vault, notify: false };
+      return { plan: answer(`${hits.length} tasks match.`, hits.map((item) => item.text).join("\n")), vault, notify: false };
+    }
+    const hits = vault.facts.filter(
+      (item) => item.key.toLowerCase().includes(needle) || item.value.toLowerCase().includes(needle),
+    );
+    if (!hits.length) return { plan: answer("Nothing saved matches."), vault, notify: false };
+    return {
+      plan: answer(`${hits.length} remembered.`, hits.map((item) => `${item.key}: ${item.value}`).join("\n")),
+      vault,
+      notify: false,
+    };
+  }
+
+  const shout = t.match(/^(?:uppercase|upper case|shout)\s+(.{1,400})$/i);
+  if (shout) {
+    const body = shout[1].toUpperCase();
+    return { plan: answer(body.length > 140 ? "Uppercase is ready." : body, body.length > 140 ? body : undefined), vault, notify: false };
+  }
+  const lower = t.match(/^(?:lowercase|lower case)\s+(.{1,400})$/i);
+  if (lower) {
+    const body = lower[1].toLowerCase();
+    return { plan: answer(body.length > 140 ? "Lowercase is ready." : body, body.length > 140 ? body : undefined), vault, notify: false };
+  }
+  const titled = t.match(/^title case\s+(.{1,400})$/i);
+  if (titled) {
+    const body = titled[1].replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+    return { plan: answer(body.length > 140 ? "Title case is ready." : body, body.length > 140 ? body : undefined), vault, notify: false };
+  }
+  const words = t.match(/^(?:count words|word count|how many words)(?: in| of| are in)?\s+(.{1,400})$/i);
+  if (words) {
+    const count = words[1].trim().split(/\s+/).filter(Boolean).length;
+    return { plan: answer(`${count} ${count === 1 ? "word" : "words"}.`), vault, notify: false };
+  }
+
   const converted = tryConvert(t);
   if (converted?.value !== null && converted) {
     const shown = formatNum(converted.value);

@@ -15,7 +15,7 @@ function spoken(text: string) {
   return text.length > 160 ? `${text.slice(0, 157)}…` : text;
 }
 
-/** Instant device actions. Natural language still goes to the model. */
+/** Instant on-device actions. Unmatched commands stay local; they do not call a model. */
 export function quickPlan(text: string): AidePlan | null {
   const t = text.trim().replace(/\s+/g, " ");
   if (/^(what(?:'s| is) the time|what time is it)\??$/i.test(t)) {

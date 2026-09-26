@@ -22,6 +22,8 @@ import { Button } from "@/components/ui/button";
 import { detectDevice, handoffHref, type DeviceKind } from "@/lib/assistant/device";
 import { cardFromPlan, makeLinkCode, normalizeCode, parseWireJob, planToWire, type Card, type WireJob } from "@/lib/assistant/jobs";
 import { applyLocal, ding, reminderLine, senseDevice, speakFree } from "@/lib/assistant/local";
+import { offlineMiss } from "@/lib/assistant/engines";
+import { CAPABILITIES, loadCloudOptIn, saveCloudOptIn } from "@/lib/assistant/policy";
 import { emptyVault, loadVault, saveVault, type Reminder, type Vault } from "@/lib/assistant/vault";
 import { useP2PRoom, type PeerInfo } from "@/lib/multiplayer";
 import { askAide, generateStill, type AidePlan } from "@/lib/studio/server";
@@ -207,6 +209,9 @@ export function Orin() {
   const [contacts, setContacts] = useState(false);
   const [canInstall, setCanInstall] = useState(false);
   const [iosHint, setIosHint] = useState(false);
+  const [cloudOn, setCloudOn] = useState(false);
+  const [cloudAsk, setCloudAsk] = useState<string | null>(null);
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
   const recRef = useRef<Rec | null>(null);
   const keepRef = useRef(false);
   const stopWanted = useRef(false);
@@ -217,6 +222,7 @@ export function Orin() {
   const turnsRef = useRef<Turn[]>([]);
   const vaultRef = useRef<Vault>(emptyVault());
   const quietRef = useRef(false);
+  const cloudRef = useRef(false);
   turnsRef.current = turns;
   quietRef.current = vault.quiet;
 
@@ -244,6 +250,9 @@ export function Orin() {
     const loaded = loadVault();
     vaultRef.current = loaded;
     setVault(loaded);
+    const opted = loadCloudOptIn();
+    cloudRef.current = opted;
+    setCloudOn(opted);
     setContacts("contacts" in navigator);
     const ios = /iPhone|iPad/i.test(navigator.userAgent);
     const standalone =
@@ -334,24 +343,36 @@ export function Orin() {
     setTurns((prev) => [...prev, { who, text: text.slice(0, 400) }].slice(-8));
   }
 
+  function setCloud(on: boolean) {
+    cloudRef.current = on;
+    setCloudOn(on);
+    saveCloudOptIn(on);
+  }
+
   async function applyPlan(plan: AidePlan) {
     if (plan.action === "studio") {
+      setPendingImage(null);
       setCard({ say: plan.say });
       setStudio(true);
       pushTurn("orin", plan.say);
       speakFree(plan.say, quietRef.current);
       return;
     }
-    let imageUrl: string | undefined;
     if (plan.action === "image" && plan.imagePrompt) {
-      setBusy("Making the image");
-      const image = await generateStill({ data: { prompt: plan.imagePrompt } });
-      if (!image.ok) setError(image.error);
-      else imageUrl = image.url;
+      setPendingImage(plan.imagePrompt);
+      setCard({
+        say: plan.say,
+        detail: plan.imagePrompt,
+        note: "Not made yet. Optional cloud image uses xAI and may spend quota.",
+      });
+      pushTurn("orin", plan.say);
+      speakFree(plan.say, quietRef.current);
+      return;
     }
-    const wire = planToWire(plan, imageUrl);
+    setPendingImage(null);
+    const wire = planToWire(plan);
     const pushed = senderRef.current?.(wire) ?? false;
-    const next = cardFromPlan(plan, imageUrl);
+    const next = cardFromPlan(plan);
     const handsJob = plan.action === "call" || plan.action === "message";
     if (pushed && device === "desktop" && handsJob) {
       next.href = undefined;
@@ -376,11 +397,13 @@ export function Orin() {
     try {
       const sensed = await senseDevice(commandText);
       if (sensed) {
+        setCloudAsk(null);
         await applyPlan(sensed);
         return;
       }
       const local = applyLocal(commandText, vaultRef.current);
       if (local) {
+        setCloudAsk(null);
         commit(local.vault);
         if (local.notify && typeof Notification !== "undefined" && Notification.permission === "default") {
           void Notification.requestPermission();
@@ -388,16 +411,58 @@ export function Orin() {
         await applyPlan(local.plan);
         return;
       }
-      setBusy("Thinking");
+      const miss = offlineMiss(commandText);
+      setCloudAsk(miss.offerCloud ? commandText : null);
+      await applyPlan(miss.plan);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Orin couldn't do that.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function askCloud() {
+    const commandText = cloudAsk;
+    if (!commandText || !cloudRef.current) return;
+    setError(null);
+    setBusy("Asking xAI");
+    try {
       const history = turnsRef.current.slice(-6).filter((turn) => turn.text.trim());
       const result = await askAide({ data: { command: commandText, history } });
       if (!result.ok) {
         setError(result.error);
         return;
       }
+      setCloudAsk(null);
       await applyPlan(result.plan);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Orin couldn't do that.");
+      setError(err instanceof Error ? err.message : "Optional cloud didn't answer.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function makePicture() {
+    const prompt = pendingImage;
+    if (!prompt || !cloudRef.current) return;
+    setError(null);
+    setBusy("Optional cloud image");
+    try {
+      const image = await generateStill({ data: { prompt } });
+      if (!image.ok) {
+        setError(image.error);
+        return;
+      }
+      setPendingImage(null);
+      setCard({
+        say: "Picture is ready.",
+        imageUrl: image.url,
+        note: "Made with optional cloud (xAI). It may have used quota.",
+      });
+      pushTurn("orin", "Picture is ready.");
+      speakFree("Picture is ready.", quietRef.current);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "The picture didn't come back.");
     } finally {
       setBusy(null);
     }
@@ -535,9 +600,9 @@ export function Orin() {
   const linked = linkPeers.some((peer) => peer.connectionState === "connected");
   const deviceLine =
     device === "phone" || device === "tablet"
-      ? `This ${device} can open the dialer, Messages, and the apps below. You confirm each one.`
+      ? `This ${device} opens the dialer, Messages, and the apps below. You confirm each one. It cannot change system settings.`
       : device === "desktop"
-        ? "Link your phone or tablet. Calls and texts wait there for your tap."
+        ? "Link your phone or tablet. Calls and texts wait there for your tap. Optional cloud is separate."
         : "Checking this device.";
 
   let linkBlock: ReactNode = null;
@@ -569,6 +634,9 @@ export function Orin() {
       ) : null}
 
       <p className="text-sm text-muted">{deviceLine}</p>
+      <p className="text-sm text-muted">
+        Core stays on this device. Optional cloud is {cloudOn ? "on" : "off"} and never runs by itself.
+      </p>
 
       <div className="flex flex-col items-center gap-4">
         <button
@@ -632,6 +700,29 @@ export function Orin() {
           onCopy={(text) => void copyText(text)}
           onShareImage={(url) => void shareImage(url)}
         />
+      ) : null}
+
+      {cloudAsk ? (
+        <section className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-4">
+          <h2 className="text-sm font-medium">Optional cloud</h2>
+          <p className="text-sm text-muted">
+            Provider: xAI. It may use quota. Nothing is sent until you tap
+            {cloudOn ? "." : ", and the switch below is still off."}
+          </p>
+          <Button variant="primary" disabled={!cloudOn || !!busy} onClick={() => void askCloud()}>
+            Ask xAI
+          </Button>
+        </section>
+      ) : null}
+
+      {pendingImage ? (
+        <section className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-4">
+          <h2 className="text-sm font-medium">Optional cloud image</h2>
+          <p className="text-sm text-muted">Provider: xAI. A picture may cost more than a text reply. It is not made yet.</p>
+          <Button variant="primary" disabled={!cloudOn || !!busy} onClick={() => void makePicture()}>
+            Make picture
+          </Button>
+        </section>
       ) : null}
 
       <section className="flex flex-col gap-3">
@@ -713,6 +804,27 @@ export function Orin() {
             </form>
           </div>
         )}
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-sm font-medium">Where work happens</h2>
+        <ul className="flex flex-col rounded-xl border border-line bg-surface">
+          {CAPABILITIES.map((row) => (
+            <li key={row.name} className="flex items-start justify-between gap-3 border-b border-line px-4 py-3 last:border-b-0">
+              <div className="min-w-0">
+                <p className="text-sm text-fg">{row.name}</p>
+                <p className="text-sm text-muted">{row.detail}</p>
+              </div>
+              <p className="shrink-0 text-xs font-medium tracking-wide text-subtle uppercase">{row.net}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="text-sm text-muted">
+          Optional cloud uses xAI and may spend quota. It is {cloudOn ? "on" : "off"}. Turning it on does not send anything.
+        </p>
+        <Button onClick={() => setCloud(!cloudOn)} aria-pressed={cloudOn}>
+          {cloudOn ? "Turn optional cloud off" : "Turn optional cloud on"}
+        </Button>
       </section>
 
       <section className="flex flex-col gap-3">

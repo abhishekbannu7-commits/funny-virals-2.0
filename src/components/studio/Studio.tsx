@@ -443,7 +443,7 @@ export function Studio() {
     setShotIndex(0);
     setElapsed(0);
     setError(null);
-    setNote("Sample storyboard. Generate a plan when you want your own.");
+    setNote("Sample storyboard stays on this device. A cloud plan replaces it only if you tap.");
   }
 
   function updateShot(patch: Partial<(typeof project.shots)[number]>) {
@@ -462,17 +462,18 @@ export function Studio() {
 
   const clipLabel =
     media[shot?.id ?? ""]?.videoState === "rendering"
-      ? "Rendering 10s"
+      ? "Cloud clip running"
       : project.mode === "chain" && shotIndex > 0
-        ? "Render 10s from last frame"
-        : "Render 10s from still";
+        ? "Cloud clip from last frame"
+        : "Cloud 10s clip";
 
   return (
     <main className="min-h-screen bg-bg text-fg">
-      <header className="flex items-center justify-between gap-3 border-b border-line px-4 py-4 sm:px-6">
-        <div>
-          <p className="text-xs font-medium tracking-widest text-muted uppercase">Studio</p>
+      <header className="flex flex-col gap-3 border-b border-line px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="min-w-0">
+          <p className="text-xs font-medium tracking-widest text-muted uppercase">Optional studio</p>
           <h1 className="font-display text-2xl leading-tight font-medium">Funny Virals</h1>
+          <p className="text-sm text-muted">Not part of Orin. Cloud steps are labeled and idle until you tap.</p>
         </div>
         <div className="flex gap-2">
           <Button onClick={loadSample}>Sample</Button>
@@ -562,6 +563,10 @@ export function Studio() {
           {error ? <p className="text-sm text-danger">{error}</p> : null}
           {note ? <p className="text-sm text-muted">{note}</p> : null}
           {busy ? <p className="text-sm text-fg">{busy}</p> : null}
+          <p className="text-sm text-muted">
+            Plan, stills, clips, voices, and edits call xAI and may spend quota. Play, sample, lock, caption copy, and
+            download stay on this device.
+          </p>
 
           <label className="flex flex-col gap-2">
             <span className="text-sm font-medium">Prompt</span>
@@ -599,7 +604,7 @@ export function Studio() {
           </p>
           <Button variant="primary" onClick={() => void onGenerate()} disabled={!!busy || prompt.trim().length < 8}>
             <Clapperboard className="size-4" />
-            Generate plan
+            Cloud plan
           </Button>
 
           <div className="flex flex-col gap-2 border-t border-line pt-4">
@@ -627,18 +632,19 @@ export function Studio() {
             <div className="flex flex-wrap gap-2">
               <Button onClick={() => void onStills()} disabled={!!busy || missingStills === 0}>
                 <ImageIcon className="size-4" />
-                {missingStills ? `Render ${missingStills} stills` : "Stills ready"}
+                {missingStills ? `Cloud stills (${missingStills})` : "Stills ready"}
               </Button>
               <Button onClick={() => void onRenderClip()} disabled={!!busy || !shot}>
                 <Film className="size-4" />
                 {clipLabel}
               </Button>
               <Button onClick={() => void onVoices()} disabled={!!busy}>
-                Render voices
+                Cloud voices
               </Button>
             </div>
             <p className="text-sm text-muted">
-              A still is a picture. A clip is 10 seconds of video and costs more. Edits clear the clip and keep the still.
+              A still is a picture. A clip is 10 seconds of video and costs more. Both are optional cloud. Edits clear the
+              clip and keep the still.
             </p>
           </div>
 
@@ -654,7 +660,7 @@ export function Studio() {
               />
             </label>
             <Button onClick={() => void onRevise()} disabled={!!busy || instruction.trim().length < 2}>
-              Apply edit
+              Cloud edit
             </Button>
             <p className="text-sm text-muted">Locked shots stay. Only dirty shots lose their clip.</p>
           </div>
