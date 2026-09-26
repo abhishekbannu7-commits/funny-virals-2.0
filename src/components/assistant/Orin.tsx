@@ -28,6 +28,7 @@ import { emptyVault, loadVault, saveVault, type Reminder, type Vault } from "@/l
 import { useP2PRoom, type PeerInfo } from "@/lib/multiplayer";
 import { askAide, generateStill, type AidePlan } from "@/lib/studio/server";
 import { Studio } from "@/components/studio/Studio";
+import { CreativeStudio } from "@/components/creative/CreativeStudio";
 
 type Rec = {
   lang: string;
@@ -196,7 +197,8 @@ export function Orin() {
   const [error, setError] = useState<string | null>(null);
   const [card, setCard] = useState<Card | null>(null);
   const [incoming, setIncoming] = useState<Card | null>(null);
-  const [studio, setStudio] = useState(false);
+  const [desk, setDesk] = useState<null | "create" | "shots">(null);
+  const [brief, setBrief] = useState("");
   const [device, setDevice] = useState<DeviceKind | null>(null);
   const [copied, setCopied] = useState(false);
   const [code, setCode] = useState<string | null>(null);
@@ -353,9 +355,13 @@ export function Orin() {
     if (plan.action === "studio") {
       setPendingImage(null);
       setCard({ say: plan.say });
-      setStudio(true);
       pushTurn("orin", plan.say);
       speakFree(plan.say, quietRef.current);
+      if (/shot desk/i.test(plan.say)) setDesk("shots");
+      else {
+        setBrief(plan.prompt ?? "");
+        setDesk("create");
+      }
       return;
     }
     if (plan.action === "image" && plan.imagePrompt) {
@@ -585,15 +591,26 @@ export function Orin() {
     setCanInstall(false);
   }
 
-  if (studio) {
+  if (desk === "shots") {
     return (
       <div>
         <div className="flex items-center justify-between border-b border-line px-4 py-3">
-          <p className="text-sm text-muted">Reel desk</p>
-          <Button onClick={() => setStudio(false)}>Back to Orin</Button>
+          <p className="text-sm text-muted">Cloud shot desk</p>
+          <Button onClick={() => setDesk("create")}>Back to studio</Button>
         </div>
         <Studio />
       </div>
+    );
+  }
+
+  if (desk === "create") {
+    return (
+      <CreativeStudio
+        key={brief || "sample"}
+        brief={brief}
+        onBack={() => setDesk(null)}
+        onShotDesk={() => setDesk("shots")}
+      />
     );
   }
 
@@ -620,7 +637,9 @@ export function Orin() {
           <p className="text-xs font-medium tracking-widest text-muted uppercase">Aide</p>
           <h1 className="font-display text-3xl leading-tight font-medium">Orin</h1>
         </div>
-        <Button onClick={() => setStudio(true)}>Reel desk</Button>
+        <Button variant="primary" onClick={() => { setBrief(""); setDesk("create"); }}>
+          Create
+        </Button>
       </header>
 
       {incoming ? (
@@ -681,7 +700,7 @@ export function Orin() {
       </form>
 
       <div className="flex flex-wrap gap-2">
-        {["Good morning", "Add task pack a bag", "Timer 5 minutes", "What is 18% of 240", "Remember home is 12 King Street"].map(
+        {["Good morning", "Add task pack a bag", "Timer 5 minutes", "What is 18% of 240", "Make a reel about AI doctors"].map(
           (hint) => (
             <Button key={hint} onClick={() => setCommand(hint)}>
               {hint}

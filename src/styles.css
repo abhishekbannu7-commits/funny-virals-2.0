@@ -49,6 +49,11 @@
   max-width: 100%;
 }
 
+.frame-16-9 {
+  aspect-ratio: 16 / 9;
+  width: min(100%, 960px);
+}
+
 @keyframes kenburns {
   from {
     transform: scale(1.04);

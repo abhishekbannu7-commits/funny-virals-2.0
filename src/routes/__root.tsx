@@ -14,7 +14,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "Orin is an on-device aide. Tasks, notes, timers, and math stay in this browser. You confirm every call and app. Cloud models stay off unless you turn them on.",
+          "Orin is an on-device aide. Tasks, notes, and a film plan stay in this browser. Cloud video stays off unless you confirm it. You confirm every call, message, and post.",
       },
       { name: "theme-color", content: "#0c0c0b" },
     ],

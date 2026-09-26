@@ -500,6 +500,7 @@ export function applyLocal(text: string, vault: Vault, now = new Date()): LocalH
           "Tasks, notes, reminders, and facts stay in this browser.",
           "Math, percentages, dates, and unit conversion stay here.",
           "Call, text, Maps, ChatGPT, Claude, WhatsApp, YouTube, Instagram, and Mail open only after you tap.",
+          "Creative studio plans and plays a film on this device. Cloud video is a separate tap.",
           "This page cannot change Wi-Fi, Bluetooth, system alarms, or read other apps' notifications.",
           "Optional cloud is a separate switch. It does nothing until you turn it on and tap again.",
         ].join("\n"),
@@ -509,10 +510,22 @@ export function applyLocal(text: string, vault: Vault, now = new Date()): LocalH
     };
   }
 
+  if (/\b(?:video|reel|film|documentary)\b/i.test(t) && /\b(?:make|create|produce|generate)\b/i.test(t)) {
+    return {
+      plan: {
+        say: "Creative studio has the brief. Posting, if you asked for it, waits for Publish.",
+        action: "studio",
+        prompt: t.slice(0, 500),
+      },
+      vault,
+      notify: false,
+    };
+  }
+
   if (/^(?:open )?(?:the )?(?:reel desk|studio)\.?$/i.test(t)) {
     return {
       plan: {
-        say: "Reel desk is open. Cloud buttons there are labeled and stay idle until you tap.",
+        say: "Creative studio is open. Cloud video stays idle until you tap it.",
         action: "studio",
       },
       vault,

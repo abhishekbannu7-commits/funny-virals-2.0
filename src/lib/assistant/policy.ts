@@ -13,7 +13,8 @@ export const CAPABILITIES: Capability[] = [
   { name: "Apps and maps", net: "On device", detail: "A link you confirm. No maps API." },
   { name: "Phone link", net: "Local link", detail: "Two open Orin screens. Not a locked phone." },
   { name: "Open-ended writing", net: "Optional cloud", detail: "Off by default. Or hand the words to ChatGPT." },
-  { name: "Reel pictures and clips", net: "Optional cloud", detail: "Reel desk only. Idle until you tap." },
+  { name: "Creative studio", net: "Offline", detail: "Plans, edits, and plays the film on this device." },
+  { name: "Cloud stills and clips", net: "Optional cloud", detail: "Shot desk only. Named, and idle until you tap." },
 ];
 
 export function loadCloudOptIn() {

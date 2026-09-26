@@ -22,7 +22,7 @@ export function offlineMiss(text: string): OfflineMiss {
     return {
       offerCloud: false,
       plan: {
-        say: spoken("Pictures are optional cloud, on the reel desk. Nothing is generated until you tap there."),
+        say: spoken("Pictures stay on the cloud shot desk. Nothing is generated until you tap a cloud button there."),
         action: "studio",
       },
     };

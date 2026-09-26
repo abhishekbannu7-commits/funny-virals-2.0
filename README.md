@@ -2,6 +2,8 @@
 
 Orin is the on-device aide for Funny Virals 2.0. Open it on a phone or tablet, or link two screens with a code. Core work stays in the browser. A hosted model is never called unless you turn optional cloud on and tap again.
 
+Creative studio plans a continuous film on the device: director, character bible, visual bible, scene graph, and an end frame each next scene must begin on. Provider choices (local, Gemini, ChatGPT, Grok, Veo) do not send anything until you confirm, and none of those providers are connected. A request to post is not permission. Publish only unlocks an official handoff. Instagram, Facebook, and YouTube are not posted from this page.
+
 What it does without a paid call:
 
 - Tasks, notes, remembered facts, and search across them
