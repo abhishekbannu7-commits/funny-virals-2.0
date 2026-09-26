@@ -15,6 +15,7 @@ export const CAPABILITIES: Capability[] = [
   { name: "Open-ended writing", net: "Optional cloud", detail: "Off by default. Or hand the words to ChatGPT." },
   { name: "Creative studio", net: "Offline", detail: "Plans, edits, and plays the film on this device." },
   { name: "Faceless channels", net: "Offline", detail: "Series, scripts, and metadata stay here. Publish is a handoff." },
+  { name: "Inspect code", net: "Offline", detail: "Reads files you pick. No terminal, no other apps." },
   { name: "Cloud stills and clips", net: "Optional cloud", detail: "Shot desk only. Named, and idle until you tap." },
 ];
 

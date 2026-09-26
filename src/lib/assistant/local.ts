@@ -2,6 +2,7 @@ import type { AidePlan } from "@/lib/studio/server";
 import { quickPlan } from "@/lib/assistant/quick";
 import { newId, type Fact, type Place, type Reminder, type Vault } from "@/lib/assistant/vault";
 import { isChannelCommand } from "@/lib/channel/plan";
+import { isInspectCommand } from "@/lib/code/inspect";
 
 export type LocalHit = { plan: AidePlan; vault: Vault; notify: boolean };
 
@@ -503,10 +504,23 @@ export function applyLocal(text: string, vault: Vault, now = new Date()): LocalH
           "Call, text, Maps, ChatGPT, Claude, WhatsApp, YouTube, Instagram, and Mail open only after you tap.",
           "Creative studio plans and plays a film on this device. Cloud video is a separate tap.",
           "Channel studio plans a faceless series on this device. Publishing waits for your confirm.",
+          "Inspect reads files you pick. It cannot run a build, a terminal, or another app.",
           "This page cannot change Wi-Fi, Bluetooth, system alarms, or read other apps' notifications.",
           "Optional cloud is a separate switch. It does nothing until you turn it on and tap again.",
         ].join("\n"),
       ),
+      vault,
+      notify: false,
+    };
+  }
+
+  if (isInspectCommand(t)) {
+    return {
+      plan: {
+        say: "Inspect is open. Files you pick stay on this device.",
+        action: "studio",
+        prompt: `inspect\n${t.slice(0, 200)}`,
+      },
       vault,
       notify: false,
     };

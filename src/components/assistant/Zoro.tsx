@@ -30,6 +30,7 @@ import { askAide, generateStill, type AidePlan } from "@/lib/studio/server";
 import { Studio } from "@/components/studio/Studio";
 import { CreativeStudio } from "@/components/creative/CreativeStudio";
 import { ChannelStudio } from "@/components/channel/ChannelStudio";
+import { InspectDesk } from "@/components/code/InspectDesk";
 
 type Rec = {
   lang: string;
@@ -198,7 +199,7 @@ export function Zoro() {
   const [error, setError] = useState<string | null>(null);
   const [card, setCard] = useState<Card | null>(null);
   const [incoming, setIncoming] = useState<Card | null>(null);
-  const [desk, setDesk] = useState<null | "create" | "shots" | "channels">(null);
+  const [desk, setDesk] = useState<null | "create" | "shots" | "channels" | "inspect">(null);
   const [brief, setBrief] = useState("");
   const [channelBrief, setChannelBrief] = useState("");
   const [device, setDevice] = useState<DeviceKind | null>(null);
@@ -387,6 +388,10 @@ export function Zoro() {
       pushTurn("orin", plan.say);
       speakFree(plan.say, quietRef.current);
       const prompt = plan.prompt ?? "";
+      if (prompt.startsWith("inspect\n")) {
+        setDesk("inspect");
+        return;
+      }
       if (prompt.startsWith("channel\n")) {
         setChannelBrief(prompt.slice("channel\n".length));
         setDesk("channels");
@@ -641,6 +646,10 @@ export function Zoro() {
     setCanInstall(false);
   }
 
+  if (desk === "inspect") {
+    return <InspectDesk onBack={() => setDesk(null)} />;
+  }
+
   if (desk === "channels") {
     return <ChannelStudio brief={channelBrief} onBack={() => setDesk(null)} />;
   }
@@ -739,6 +748,7 @@ export function Zoro() {
         <p className="text-sm text-muted">{listening ? "Listening" : busy ?? "Tap the circle, or type below. Zoro speaks the reply."}</p>
         <div className="flex flex-wrap items-center justify-center gap-2">
           <Button onClick={hearZoro}>{vault.quiet ? "Turn voice on" : "Hear Zoro"}</Button>
+          <Button onClick={() => setDesk("inspect")}>Inspect code</Button>
           <Button onClick={toggleKeep} aria-pressed={keep}>
             {keep ? "Stop staying on" : "Stay listening"}
           </Button>
