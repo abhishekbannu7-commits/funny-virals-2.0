@@ -67,27 +67,123 @@
   animation: kenburns 10s linear forwards;
 }
 
-.zoro-orb {
-  width: 7.5rem;
-  height: 7.5rem;
-  border-radius: 999px;
-  border: 1px solid var(--color-line);
-  background: var(--color-surface);
-  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1), border-color 250ms cubic-bezier(0.22, 1, 0.36, 1);
+.zoro-stage {
+  position: relative;
 }
 
-.zoro-orb[data-linked="true"] {
+.zoro-stage::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: 46vh;
+  background:
+    linear-gradient(180deg, rgba(12, 12, 11, 0.15), var(--color-bg) 92%),
+    url("/brand/stage.jpg") center 30% / cover no-repeat;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.zoro-coin {
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: none;
+  perspective: 600px;
+}
+
+.zoro-mark {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  object-fit: cover;
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(243, 241, 234, 0.28);
+  animation: zoro-coin 9s linear infinite;
+  transform-style: preserve-3d;
+}
+
+.zoro-orb {
+  position: relative;
+  width: 8.75rem;
+  height: 8.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  perspective: 900px;
+  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.zoro-orb-scene {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  animation: zoro-tilt 7s ease-in-out infinite;
+}
+
+.zoro-orb-core {
+  position: absolute;
+  inset: 11%;
+  border-radius: 999px;
+  background: url("/brand/sphere.jpg") center / cover no-repeat;
+  box-shadow:
+    0 22px 40px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(243, 241, 234, 0.35);
+  animation: none;
+}
+
+.zoro-orb-ring {
+  position: absolute;
+  inset: 2%;
+  border-radius: 999px;
+  border: 1px solid rgba(213, 228, 238, 0.72);
+  transform: rotateX(70deg);
+}
+
+.zoro-orb-ring-2 {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(243, 241, 234, 0.28);
+  transform: rotateY(70deg);
+}
+
+.zoro-orb > svg {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.65));
+}
+
+.zoro-orb[data-linked="true"] .zoro-orb-ring {
   border-color: var(--color-accent);
 }
 
 .zoro-orb[data-live="true"] {
-  border-color: var(--color-accent);
   animation: zoro-pulse 1.6s ease-in-out infinite;
 }
 
 @keyframes zoro-pulse {
   50% {
     transform: scale(1.04);
+  }
+}
+
+@keyframes zoro-tilt {
+  0%,
+  100% {
+    transform: rotateX(14deg) rotateY(-22deg);
+  }
+  50% {
+    transform: rotateX(14deg) rotateY(22deg);
+  }
+}
+
+@keyframes zoro-coin {
+  0%,
+  100% {
+    transform: rotateY(-18deg);
+  }
+  50% {
+    transform: rotateY(18deg);
   }
 }
 
@@ -105,7 +201,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .kenburns,
-  .zoro-orb[data-live="true"] {
+  .zoro-orb[data-live="true"],
+  .zoro-orb-scene,
+  .zoro-mark {
     animation: none;
   }
 }

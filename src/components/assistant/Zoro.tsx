@@ -684,12 +684,17 @@ export function Zoro() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-6 px-4 py-6">
+    <main className="zoro-stage mx-auto flex min-h-screen w-full max-w-lg flex-col gap-6 px-4 py-6">
       {linkBlock}
       <header className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-medium tracking-widest text-muted uppercase">Aide</p>
-          <h1 className="font-display text-3xl leading-tight font-medium">Zoro</h1>
+        <div className="flex items-center gap-3">
+          <div className="zoro-coin">
+            <img src="/brand/mark.jpg" alt="" className="zoro-mark" />
+          </div>
+          <div>
+            <p className="text-xs font-medium tracking-widest text-muted uppercase">Aide</p>
+            <h1 className="font-display text-3xl leading-tight font-medium">Zoro</h1>
+          </div>
         </div>
         <div className="flex shrink-0 gap-2">
           <Button onClick={() => { setChannelBrief(""); setDesk("channels"); }}>Channels</Button>
@@ -724,6 +729,11 @@ export function Zoro() {
           aria-pressed={listening}
         >
           {listening ? <Square className="size-6" /> : <Mic className="size-6" />}
+          <span className="zoro-orb-scene" aria-hidden="true">
+            <span className="zoro-orb-core" />
+            <span className="zoro-orb-ring" />
+            <span className="zoro-orb-ring-2" />
+          </span>
           <span className="sr-only">{listening ? "Stop listening" : "Listen"}</span>
         </button>
         <p className="text-sm text-muted">{listening ? "Listening" : busy ?? "Tap the circle, or type below. Zoro speaks the reply."}</p>
