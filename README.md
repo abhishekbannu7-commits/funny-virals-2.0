@@ -1,6 +1,6 @@
 # Funny Virals 2.0
 
-Orin is the on-device aide for Funny Virals 2.0. Open it on a phone or tablet, or link two screens with a code. Core work stays in the browser. A hosted model is never called unless you turn optional cloud on and tap again.
+Zoro is the on-device aide for Funny Virals 2.0. Open it on a phone or tablet, or link two screens with a code. Core work stays in the browser. A hosted model is never called unless you turn optional cloud on and tap again.
 
 Creative studio plans a continuous film on the device: director, character bible, visual bible, scene graph, and an end frame each next scene must begin on. Provider choices (local, Gemini, ChatGPT, Grok, Veo) do not send anything until you confirm, and none of those providers are connected. A request to post is not permission. Publish only unlocks an official handoff. Instagram, Facebook, and YouTube are not posted from this page.
 
@@ -15,9 +15,9 @@ What it does without a paid call:
 
 Optional cloud uses xAI and may spend quota. It is off by default. Turning the switch on does not send anything. Ask xAI is a second tap, and it names the provider first. Pictures are not made until you tap Make picture.
 
-The reel desk is separate from Orin. Sample playback, locks, and download stay on the device. Plan, stills, 10-second clips, voices, and plan edits are labeled as cloud and stay idle until you tap them. Those calls use `XAI_API_KEY` in the server environment. Do not commit that key.
+The reel desk is separate from Zoro. Sample playback, locks, and download stay on the device. Plan, stills, 10-second clips, voices, and plan edits are labeled as cloud and stay idle until you tap them. Those calls use `XAI_API_KEY` in the server environment. Do not commit that key.
 
-This page cannot change Wi-Fi, Bluetooth, system alarms, or read other apps' notifications, and it cannot control a phone that does not have Orin open.
+This page cannot change Wi-Fi, Bluetooth, system alarms, or read other apps' notifications, and it cannot control a phone that does not have Zoro open.
 
 `templates/` is the original 1080×1350 slide pack.
 
