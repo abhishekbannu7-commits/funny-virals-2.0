@@ -214,6 +214,7 @@ export function Orin() {
   const [cloudOn, setCloudOn] = useState(false);
   const [cloudAsk, setCloudAsk] = useState<string | null>(null);
   const [pendingImage, setPendingImage] = useState<string | null>(null);
+  const [updateReady, setUpdateReady] = useState(false);
   const recRef = useRef<Rec | null>(null);
   const keepRef = useRef(false);
   const stopWanted = useRef(false);
@@ -268,6 +269,32 @@ export function Orin() {
     };
     window.addEventListener("beforeinstallprompt", onPrompt);
     return () => window.removeEventListener("beforeinstallprompt", onPrompt);
+  }, []);
+
+  useEffect(() => {
+    const mine = import.meta.env.VITE_BUILD_ID || "dev";
+    if (mine === "dev") return;
+    let stop = false;
+    const check = () => {
+      fetch("/api/version", { cache: "no-store" })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((body: { id?: string } | null) => {
+          if (stop || !body?.id || body.id === mine) return;
+          setUpdateReady(true);
+        })
+        .catch(() => undefined);
+    };
+    check();
+    const timer = window.setInterval(check, 60_000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") check();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      stop = true;
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
   useEffect(() => {
@@ -875,10 +902,24 @@ export function Orin() {
           })}
         </div>
         {contacts ? <p className="text-sm text-muted">Call and Text can open this phone's contact list.</p> : null}
+        <p className="text-sm text-muted">
+          Phone and tablet: open{" "}
+          <a
+            href="https://orin-aide.netlify.app"
+            {...externalLink("https://orin-aide.netlify.app")}
+            className="text-fg underline"
+          >
+            orin-aide.netlify.app
+          </a>
+          , then add it to the home screen.
+        </p>
         {canInstall ? (
           <Button onClick={() => void install()}>Add Orin to this home screen</Button>
         ) : iosHint ? (
           <p className="text-sm text-muted">On iPhone or iPad, use Share, then Add to Home Screen, so Orin stays put.</p>
+        ) : null}
+        {updateReady ? (
+          <Button onClick={() => window.location.reload()}>Update ready. Reload</Button>
         ) : null}
       </section>
 
