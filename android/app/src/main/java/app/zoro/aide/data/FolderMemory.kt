@@ -8,19 +8,25 @@ import kotlinx.coroutines.flow.map
 
 private val Context.folderStore by preferencesDataStore(name = "zoro")
 
-data class RememberedFolder(val uri: String, val label: String)
+data class Remembered(val mode: String, val uri: String, val label: String)
 
 class FolderMemory(private val context: Context) {
+    private val modeKey = stringPreferencesKey("mode")
     private val uriKey = stringPreferencesKey("tree_uri")
     private val labelKey = stringPreferencesKey("tree_label")
 
-    val folder = context.folderStore.data.map { prefs ->
+    val saved = context.folderStore.data.map { prefs ->
         val uri = prefs[uriKey] ?: return@map null
-        RememberedFolder(uri, prefs[labelKey] ?: "Folder")
+        Remembered(prefs[modeKey] ?: "tree", uri, prefs[labelKey] ?: "Files")
     }
 
-    suspend fun save(uri: String, label: String) {
+    suspend fun saveTree(uri: String, label: String) = save("tree", uri, label)
+
+    suspend fun saveFiles(uris: List<String>, label: String) = save("files", uris.joinToString("\n"), label)
+
+    private suspend fun save(mode: String, uri: String, label: String) {
         context.folderStore.edit { prefs ->
+            prefs[modeKey] = mode
             prefs[uriKey] = uri
             prefs[labelKey] = label
         }

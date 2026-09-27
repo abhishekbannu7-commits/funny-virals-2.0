@@ -16,6 +16,7 @@ data class InspectFile(
 data class SourceFile(
     val name: String,
     val text: String,
+    val uri: String = "",
 )
 
 data class InspectReport(
@@ -71,4 +72,21 @@ fun inspectTexts(input: List<SourceFile>): InspectReport {
         }
     }
     return InspectReport(files, findings, skipped, bytes)
+}
+
+fun explain(report: InspectReport): String {
+    if (report.files.isEmpty()) {
+        val why = if (report.skipped.isEmpty()) "Nothing was picked." else "Skipped: ${report.skipped.take(4).joinToString(", ")}."
+        return "I could not read any text. $why Photos and other binaries stay unread. Nothing was sent."
+    }
+    val secrets = report.findings.count { it.kind == "secret" }
+    val todos = report.findings.count { it.kind == "todo" }
+    val bugs = report.findings.count { it.kind == "debugger" || it.kind == "empty-catch" }
+    val marks = buildList {
+        if (secrets > 0) add("$secrets secret-like line${if (secrets == 1) "" else "s"}, not copied")
+        if (todos > 0) add("$todos TODO or FIXME")
+        if (bugs > 0) add("$bugs debugger or empty catch")
+    }
+    val found = if (marks.isEmpty()) "Nothing stood out in the text." else marks.joinToString(". ") + "."
+    return "I read ${report.files.size} file${if (report.files.size == 1) "" else "s"}, ${report.bytes} characters, on this phone. $found Nothing was sent."
 }

@@ -60,7 +60,7 @@ suspend fun readTree(context: Context, tree: Uri): ReadBatch = withContext(Dispa
                 }
                 val uri = DocumentsContract.buildDocumentUriUsingTree(tree, id)
                 val text = readText(context, uri)
-                if (text == null) unread += path else files += SourceFile(path, text)
+                if (text == null) unread += path else files += SourceFile(path, text, uri.toString())
             }
         }
     }
@@ -74,7 +74,7 @@ suspend fun readDocuments(context: Context, uris: List<Uri>): ReadBatch = withCo
     for (uri in uris.take(cap)) {
         val name = displayName(context, uri) ?: "file"
         val text = readText(context, uri)
-        if (text == null) unread += name else files += SourceFile(name, text)
+        if (text == null) unread += name else files += SourceFile(name, text, uri.toString())
     }
     if (uris.size > cap) unread += "${uris.size - cap} files over the 40-file cap"
     ReadBatch(if (files.size == 1) files[0].name else "Selected files", files, unread)
@@ -92,4 +92,9 @@ private fun readText(context: Context, uri: Uri): String? {
     if (bytes.size > byteCap) return null
     if (bytes.any { it == 0.toByte() }) return null
     return bytes.toString(Charsets.UTF_8)
+}
+
+fun writeText(context: Context, uri: Uri, text: String) {
+    val stream = context.contentResolver.openOutputStream(uri, "wt") ?: error("Android did not open this file for writing.")
+    stream.use { it.write(text.toByteArray(Charsets.UTF_8)) }
 }
